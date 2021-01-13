@@ -1,15 +1,19 @@
 package com.example.chat_application;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -111,6 +115,21 @@ public class MessageActivity extends AppCompatActivity {
         status = findViewById(R.id.status);
         btn_send = findViewById(R.id.btn_send);
         text_send = findViewById(R.id.text_send);
+
+
+        profile_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog();
+            }
+        });
+
+        findViewById(R.id.profile_toolbar_detail).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog();
+            }
+        });
 
         intent = getIntent();
         userid = intent.getStringExtra("userid");
@@ -330,5 +349,30 @@ public class MessageActivity extends AppCompatActivity {
         reference.removeEventListener(seenListener);
         status("offline");
         currentUser("none");
+    }
+
+    private void showAlertDialog(){
+        final Dialog dialog = new Dialog(MessageActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.profile_layout);
+
+        ImageView imageView = (ImageView) dialog.findViewById(R.id.profile_image);
+        TextView textView = (TextView) dialog.findViewById(R.id.friends_Profile_Image);
+
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                textView.setText(user.getUsername());
+                if (!user.getImageURL().equals("default")){
+                    Glide.with(getApplicationContext()).load(user.getImageURL()).into(imageView);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
+        });
+        dialog.show();
     }
 }
