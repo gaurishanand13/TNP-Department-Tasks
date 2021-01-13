@@ -2,6 +2,8 @@ package com.example.chat_application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,7 +43,7 @@ import retrofit2.Response;
 public class MessageActivity extends AppCompatActivity {
 
     CircleImageView profile_image;
-    TextView username;
+    TextView username, status;
 
     FirebaseUser fuser;
     DatabaseReference reference;
@@ -64,6 +66,19 @@ public class MessageActivity extends AppCompatActivity {
 
     boolean notify = false;
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,13 +88,15 @@ public class MessageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // and this
-                startActivity(new Intent(com.example.chat_application.MessageActivity.this, com.example.chat_application.MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
-        });
+
+
+//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // and this
+//                startActivity(new Intent(com.example.chat_application.MessageActivity.this, com.example.chat_application.MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+//            }
+//        });
 
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
@@ -91,6 +108,7 @@ public class MessageActivity extends AppCompatActivity {
 
         profile_image = findViewById(R.id.profile_image);
         username = findViewById(R.id.username);
+        status = findViewById(R.id.status);
         btn_send = findViewById(R.id.btn_send);
         text_send = findViewById(R.id.text_send);
 
@@ -120,8 +138,9 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 username.setText(user.getUsername());
+                status.setText(user.getStatus());
                 if (user.getImageURL().equals("default")){
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
+                    profile_image.setImageResource(R.drawable.blank_profile);
                 } else {
                     //and this
                     Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
@@ -244,7 +263,7 @@ public class MessageActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onFailure(Call<MyResponse> call, Throwable t) {
-
+                                    Log.i("error in notif",t.getMessage().toString());
                                 }
                             });
                 }
@@ -298,7 +317,6 @@ public class MessageActivity extends AppCompatActivity {
 
         reference.updateChildren(hashMap);
     }
-
     @Override
     protected void onResume() {
         super.onResume();

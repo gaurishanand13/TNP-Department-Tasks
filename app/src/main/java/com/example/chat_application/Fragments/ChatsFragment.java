@@ -62,7 +62,6 @@ public class ChatsFragment extends Fragment {
                     Chatlist chatlist = snapshot.getValue(Chatlist.class);
                     usersList.add(chatlist);
                 }
-
                 chatList();
             }
 

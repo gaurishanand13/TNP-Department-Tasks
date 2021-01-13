@@ -33,11 +33,8 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.example.chat_application.Model.User;
 import com.example.chat_application.R;
-
 import java.util.HashMap;
-
 import de.hdodenhof.circleimageview.CircleImageView;
-
 import static android.app.Activity.RESULT_OK;
 
 
@@ -75,7 +72,7 @@ public class ProfileFragment extends Fragment {
                 User user = dataSnapshot.getValue(User.class);
                 username.setText(user.getUsername());
                 if (user.getImageURL().equals("default")){
-                    image_profile.setImageResource(R.mipmap.ic_launcher);
+                    image_profile.setImageResource(R.drawable.blank_profile);
                 } else {
                     Glide.with(getContext()).load(user.getImageURL()).into(image_profile);
                 }
@@ -112,7 +109,7 @@ public class ProfileFragment extends Fragment {
 
     private void uploadImage(){
         final ProgressDialog pd = new ProgressDialog(getContext());
-        pd.setMessage("Uploading");
+        pd.setMessage("Uploading ...");
         pd.show();
 
         if (imageUri != null){
@@ -155,6 +152,7 @@ public class ProfileFragment extends Fragment {
                 }
             });
         } else {
+            pd.dismiss();
             Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
         }
     }
